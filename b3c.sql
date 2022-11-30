@@ -1,44 +1,36 @@
-﻿alter procedure THEMNHANVIENN
-	@honv nvarchar(15),
-	@tenlot nvarchar(15),
-	@tennv nvarchar(15),
-	@manv nvarchar(9),
-	@ngsinh datetime,
-	@dchi nvarchar(30),
-	@phai nvarchar(3),
-	@luong float,
-	@phg int
+﻿create proc sp_ThemNhanVien
+	@HONV NVARCHAR(15), @TENLOT NVARCHAR(15),
+	@TENNV NVARCHAR(15), @MANV NVARCHAR(15),
+	@NGSINH DATETIME , @DCHI NVARCHAR (15),
+	@PHAI NVARCHAR(3),@LUONG FLOAT, @PHG INT
 as
 begin
-	if not exists (select * from PHONGBAN where TENPHG = 'IT' and MAPHG= @phg)
-	begin 
-		print N'Phòng phải là phòng it';
+	if not exists (select * from PHONGBAN where  TENPHG = 'IT')
+	begin
+		print 'Phòng này là phòng IT';
 		return;
 	end;
-	declare @ma_nql nvarchar(9);
-
-	if @luong > 25000
-		set @ma_nql = '005';
-	else 
-		set @ma_nql = '000'
-
+	declare @Ma_NQL nvarchar(15);
+	if @LUONG > 25000
+		set @Ma_NQL ='005';
+	else
+		set @Ma_NQL ='009';
 	declare @age int;
-	select @age =  datediff(year, @ngsinh, getdate()) +1;
-	if @phai = 'Nam' and (@age < 18 or @age >60)
+	select @age = DATEDIFF(year,@ngsinh,getdate() )+1;
+	if @PHAI = 'Nam' and (@age<18 or @age>60)
 	begin
-		print N'Nam phải có độ tuổi 18-65';
+		print N'Nam phải có dộ tuổi từ 18 đến 65'
 		return;
 	end;
-	else if @phai = 'Nữ' and (@age <18 or @age >60)
+	else if @PHAI = 'Nữ' and (@age < 16 or @age > 60)
 	begin
-		print N'Nữ phải có độ tuổi 18-60'
+		print N'Nữ phải có đọ tuổi từ 18 đến 60';
 		return;
 	end;
-	insert into db.NHANVIEN
-		(HONV, TENLOT, TENNV, MANV, NGSINH, DCHI,PHAI, LUONG, MA_NQL, PHG)
-	values
-		(@honv,@tenlot,@tennv,@manv,@ngsinh,@dchi,@phai,@luong,@ma_nql,@phg)
+	insert into  [dbo].[NHANVIEN] 
+		(HONV,TENLOT,TENNV,MANV,NGSINH,DCHI,PHAI,LUONG,MA_NQL,PHG)
+	values 
+		(@HONV,@TENLOT,@TENNV,@MANV,@NGSINH,@DCHI,@PHAI,@LUONG,@MA_NQL,@PHG);
 end;
 
-exec [dbo].[THEMNHANVIENN] N'Nguyễn', N'Kim', N'Hoa', '030', '1-12-1997',N'Biên Hoà','Nữ',30000, 6;
-
+ exec [dbo].[ThemNhanVien] N'Nguyễn ', N'Văn ',N'Quyết','030','1-11-1998',N'Bình Thuận','Nam ',300000,6;
